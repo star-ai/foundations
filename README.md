@@ -9,18 +9,18 @@ create a python file in agent dir and inherit from pysc2.agents.base_agent simil
 e.g. [a2c.py](agent/a2c.py) (this is just a copy of a scripted agent for now)
 
 # Running an agent
-###Running from bash
+### Running from bash
 ```bash
 export SC2PATH=/[your path to]/StarCraftII/
 # e.g. run the scripted agent CollectMineralShards from the pysc2_agents.py file in the agent dir 
 python -m pysc2.bin.agent --map CollectMineralShards --agent agent.pysc2_agents.CollectMineralShards
 ```
-###Running in pycharm - using deepmind agent runner
+### Running in pycharm - using deepmind agent runner
 configure runner similar to below, using your own interpreter ofcourse
 ![run config](images/pycharm_run_config.png)
 
 
-###Running in pycharm - using local agent runner
+### Running in pycharm - using local agent runner
 configure the Defaults in run configuration to be similar to above 
 (for the Environment section only)  
 change the agent and map by modifying this lines in custom_agent.py
