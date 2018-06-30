@@ -23,4 +23,10 @@ configure runner similar to below, using your own interpreter ofcourse
 ###Running in pycharm - using local agent runner
 configure the Defaults in run configuration to be similar to above 
 (for the Environment section only)  
+change the agent and map by modifying this lines in custom_agent.py
+```python
+flags.DEFINE_string("agent", "agent.a2c.A2CMoveToBeacon",
+...
+flags.DEFINE_string("map", "MoveToBeacon", "Name of a map to use.")
+```
 run custom_agent.py from pycharm "right click -> run". 
