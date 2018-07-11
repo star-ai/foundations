@@ -35,9 +35,9 @@ from pysc2.lib import stopwatch
 
 FLAGS = flags.FLAGS
 flags.DEFINE_bool("render", True, "Whether to render with pygame.")
-point_flag.DEFINE_point("feature_screen_size", "84",
+point_flag.DEFINE_point("feature_screen_size", "42",
                         "Resolution for screen feature layers.")
-point_flag.DEFINE_point("feature_minimap_size", "64",
+point_flag.DEFINE_point("feature_minimap_size", "32",
                         "Resolution for minimap feature layers.")
 point_flag.DEFINE_point("rgb_screen_size", None,
                         "Resolution for rendered screen.")
