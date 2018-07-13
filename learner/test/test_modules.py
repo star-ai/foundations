@@ -1,5 +1,5 @@
 import unittest
-from brain.modules import ConvModule, DenseModule, softmax2D
+from learner.modules import ConvModule, DenseModule, softmax2D
 
 import os
 import tensorflow.contrib.eager as tfe

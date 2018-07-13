@@ -5,7 +5,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
-from brain.screen_only import ScreenSelectAndMoveBrain
+from learner.screen_only import ScreenSelectAndMoveLearner
 from memory.memory import Transition, ReplayMemory, EpisodicMemory
 
 from pysc2.agents import base_agent
@@ -35,7 +35,7 @@ class A2CMoveToBeacon(base_agent.BaseAgent):
     super().__init__()
     self.action_optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
     self.value_optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
-    self.brain = ScreenSelectAndMoveBrain()
+    self.brain = ScreenSelectAndMoveLearner()
     self.memory = EpisodicMemory(gamma=0.99)
     self.batch_size = 32
 

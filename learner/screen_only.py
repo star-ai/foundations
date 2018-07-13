@@ -1,13 +1,13 @@
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
-from brain.modules import ConvModule, DenseModule, softmax2D
+from learner.modules import ConvModule, DenseModule, softmax2D
 
 """
 Assuming 84x84x17 screen input
 and only produces a click_move output on screen
 """
-class ScreenSelectAndMoveBrain(tf.keras.Model):
+class ScreenSelectAndMoveLearner(tf.keras.Model):
   def __init__(self, gamma=0.99, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.gamma = gamma

@@ -1,7 +1,7 @@
 import unittest
 
-from brain.screen_only import ScreenSelectAndMoveBrain
-from brain.modules import softmax2D
+from learner.screen_only import ScreenSelectAndMoveLearner
+from learner.modules import softmax2D
 
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
@@ -14,7 +14,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 
 class TestScreenSelectAndMoveBrain(unittest.TestCase):
   def setUp(self):
-    self.model = ScreenSelectAndMoveBrain()
+    self.model = ScreenSelectAndMoveLearner()
 
   def test_call(self):
     x = tf.random_normal((2, 84, 84, 17))
