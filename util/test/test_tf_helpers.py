@@ -28,7 +28,7 @@ class TestTFHelper(unittest.TestCase):
     self.assertEqual(y.numpy()[1][1], 2)
 
 
-  def test_tf_multinomial(self):
+  def test_choose_2D(self):
     p = np.array([[0.05, 0.05, 0.05],
                   [0.05, 0.60, 0.05],
                   [0.05, 0.05, 0.05],
@@ -40,6 +40,23 @@ class TestTFHelper(unittest.TestCase):
 
     y = TFHelper.choose_2D(p)
     # print(y)
+
+  def test_coords_to_2D_onehot(self):
+    p = np.array([[0.05, 0.05, 0.05],
+                  [0.05, 0.60, 0.05],
+                  [0.05, 0.05, 0.05],
+                  ])
+    p = np.expand_dims(p, axis=2)
+    p = np.expand_dims(p, axis=0) # build [1, 3, 3, 1]
+
+    p = tf.constant(p)
+
+    y = TFHelper.choose_2D(p)
+    print(y)
+
+    z = TFHelper.coords_to_2D_onehot(y, p.shape)
+    print(z)
+
 
 
 if __name__ == "__main__":

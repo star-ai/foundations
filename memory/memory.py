@@ -5,7 +5,20 @@ import numpy as np
 
 Transition = namedtuple("Transition", ["s", "a", "s_1", "r", "done"])
 
-class ReplayMemory(object):
+class SimpleBaseMemory(object):
+  """Some basic convenience methods classes can use"""
+  def __len__(self):
+    return len(self.memory)
+
+  def __str__(self):
+    result = []
+    for i in range(self.__len__()):
+      result.append(self.memory[i].__str__() + " \n")
+    return "".join(result)
+
+
+class ReplayMemory(SimpleBaseMemory):
+  """A replay memory with capacity that allows random sampling"""
   def __init__(self, capacity):
     self.capacity = capacity
     self.memory = []
@@ -28,11 +41,38 @@ class ReplayMemory(object):
     done = np.expand_dims(np.array(list(batched.done)), axis=1)
     return [s, a, s_1, r, done]
 
-  def __len__(self):
-    return len(self.memory)
 
-  def __str__(self):
-    result = []
-    for i in range(self.__len__()):
-      result.append(self.memory[i].__str__() + " \n")
-    return "".join(result)
+class EpisodicMemory(SimpleBaseMemory):
+  """
+    A simple memory for storing states for an entire episode and then use the entire trajectory for training
+    Rewards for each timestep are the total discounted future rewards according to gamma
+  """
+  def __init__(self, gamma=0.99):
+    self.memory = []
+    self.gamma = gamma
+
+  def reset(self):
+    self.memory = []
+
+  def push(self, transition):
+    self.memory.append(transition)
+
+  def sample(self):
+    batched = Transition(*zip(*self.memory))
+    s = np.array(list(batched.s))
+    a = np.array(list(batched.a))
+    s1 = np.array(list(batched.s_1))
+    r = np.array(list(batched.r), dtype="float32")
+    done = np.expand_dims(np.array(list(batched.done)), axis=1)
+
+    reward = 0.
+    for i in reversed(range(len(r))):
+        moving_reward = self.gamma * reward
+        reward = r[i] + moving_reward
+        r[i] = reward
+        # print(i, len(r)-i-1, r[i])
+    r = np.expand_dims(r, axis=1)
+
+    # clear memory
+    self.reset()
+    return [s, a, s1, r, done]

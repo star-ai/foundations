@@ -28,3 +28,14 @@ class TFHelper():
     coords = np.transpose(index[1:3])
     # print(coords)
     return coords
+
+  @staticmethod
+  def coords_to_2D_onehot(coords, shape):
+    """
+    convert coordinates from [x, y] to a 2D one hot matrix
+    :param coords: [batch, [x, y]]
+    :param shape: (batch, w, h, 1)
+    :return: 
+    """
+    indices = tf.constant([[]])
+    print(coords, shape)

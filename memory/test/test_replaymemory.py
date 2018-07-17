@@ -10,7 +10,7 @@ class TestReplayMemory(unittest.TestCase):
     for i in range(20):
       a = Transition([0, 1, 2, 3], [0, 1], [4, 5, 6, 7], 0, True)
       self.memory.push(a)
-    self.assertEqual(len(self.memory.memory), 10)
+    self.assertEqual(len(self.memory), 10)
 
   def test_sample(self):
     for i in range(10):
