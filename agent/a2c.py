@@ -105,6 +105,6 @@ class A2CMoveToBeacon(base_agent.BaseAgent):
     # print("training")
     # s_0, a_0, s_1, r_1, done = self.memory.sample(self.batch_size)
     s_0, a_0, s_1, r_1, done = self.memory.sample()
-    self.brain.train(s_0=s_0, a_0=a_0, s_1=s_1, r_1=r_1, done=done, num_actions=42*42,
+    self.brain.train(s_0=s_0, a_0=a_0, s_1=s_1, r_1=r_1, done=done, num_actions=28*28,
                      p_optimizer=self.action_optimizer, v_optimizer=self.value_optimizer)
 
