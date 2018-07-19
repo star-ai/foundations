@@ -76,3 +76,21 @@ class EpisodicMemory(SimpleBaseMemory):
     # clear memory
     self.reset()
     return [s, a, s1, r, done]
+
+class Gt():
+  def __init__(self):
+    self.all_returns = []
+
+  def add_episode_rewards(self, rewards):
+    """
+    :param rewards: rewards at every timestep: expected shape: (x,) 
+    :return: historical mean at every step 
+    """
+    mu = np.zeros_like(rewards, dtype=np.float32)
+    for i, r in enumerate(rewards):
+      if len(self.all_returns) < i+1:
+        self.all_returns.append([])
+      self.all_returns[i].append(r)
+      mu[i] = np.mean(self.all_returns[i])
+    return mu
+
