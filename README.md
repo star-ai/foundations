@@ -4,9 +4,9 @@
 Follow instructions at [pysc2 github](https://github.com/deepmind/pysc2)
 
 # Creating a new agent
-create a python file in agent dir and inherit from pysc2.agents.base_agent similar to [pysc2_agents.py](agent/pysc2_agents.py)
+create a python file in agent dir and inherit from pysc2.agents.base_agent similar to [pysc2_agents.py](agent/sc2/pysc2_agents.py)
 
-e.g. [a2c.py](agent/a2c.py) (this is just a copy of a scripted agent for now)
+e.g. [a2c.py](agent/sc2/a2c.py) (this is just a copy of a scripted agent for now)
 
 # Running an agent
 ### Running from bash

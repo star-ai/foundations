@@ -1,11 +1,10 @@
 import unittest
 
-from learner.screen_only import ScreenSelectAndMoveLearner
-from learner.modules import softmax2D
-
+import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
-import numpy as np
+
+from learner.sc2.screen_only import ScreenSelectAndMoveLearner
 
 tfe.enable_eager_execution()
 import os

@@ -1,10 +1,10 @@
 import unittest
 
-from learner.reinforce import SimpleDenseLearner
-
+import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
-import numpy as np
+
+from learner.gym.reinforce import SimpleDenseLearner
 
 tfe.enable_eager_execution()
 import os

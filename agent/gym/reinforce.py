@@ -1,11 +1,10 @@
-from agent.gym.base_agent import BaseAgent
-from learner.reinforce import SimpleDenseLearner
-from memory.memory import EpisodicMemory, Transition, Gt
-
+import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
-import numpy as np
 
+from agent.gym.base_agent import BaseAgent
+from learner.gym.reinforce import SimpleDenseLearner
+from memory.memory import EpisodicMemory, Gt
 from memory.sarsd import SARSD
 
 tfe.enable_eager_execution()

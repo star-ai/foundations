@@ -5,14 +5,12 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
-from learner.screen_only import ScreenSelectAndMoveLearner
-from memory.memory import Transition, ReplayMemory, EpisodicMemory
-
 from pysc2.agents import base_agent
 from pysc2.lib import actions
 from pysc2.lib import features
 
-from util.tf_helpers import TFHelper
+from learner.sc2.screen_only import ScreenSelectAndMoveLearner
+from memory.memory import Transition, EpisodicMemory
 
 tfe.enable_eager_execution()
 

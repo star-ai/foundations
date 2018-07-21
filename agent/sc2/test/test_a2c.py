@@ -1,8 +1,8 @@
 import unittest
 
-
-from agent.a2c import A2CMoveToBeacon
 import numpy as np
+
+from agent.sc2.a2c import A2CMoveToBeacon
 
 
 class TestA2CMoveToBeacon(unittest.TestCase):

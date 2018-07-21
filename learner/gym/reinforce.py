@@ -1,5 +1,4 @@
 import tensorflow as tf
-import tensorflow.contrib.eager as tfe
 
 from learner.modules import ConvModule, DenseModule, softmax2D
 from learner.train import train_vanilla_pg_policy
