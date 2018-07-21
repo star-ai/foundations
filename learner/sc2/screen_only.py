@@ -34,20 +34,20 @@ class ScreenSelectAndMoveLearner(tf.keras.Model):
     :param training: whether we're in training mode
     :return: 
     """
-    core = self.core_conv1(inputs)
-    core = self.core_conv2(core)
-    core = self.core_conv_final(core)
+    core = self.core_conv1(inputs, training=training)
+    core = self.core_conv2(core, training=training)
+    core = self.core_conv_final(core, training=training)
 
-    policy = self.policy1(core)
+    policy = self.policy1(core, training=training)
     policy = tf.reshape(policy, (policy.shape[0], -1))
     policy = tf.nn.softmax(policy)
 
-    value = self.value0(core)
+    value = self.value0(core, training=training)
     value = self.flatten(value)
-    value = self.value1(value)
-    value = self.value2(value)
-    value = self.value3(value)
-    value = self.value4(value)
+    value = self.value1(value, training=training)
+    value = self.value2(value, training=training)
+    value = self.value3(value, training=training)
+    value = self.value4(value, training=training)
 
     return policy, value
 
@@ -62,7 +62,7 @@ class ScreenSelectAndMoveLearner(tf.keras.Model):
       loss = tf.reduce_sum(loss, reduction_indices=1)
       loss = tf.log(loss)
 
-      print("P Loss:", loss)
+      print("P Loss:", tf.reduce_sum(loss))
       final_loss = -tf.reduce_mean(loss * advantage)
 
     grads = tape.gradient(final_loss, self.variables)

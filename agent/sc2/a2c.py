@@ -5,14 +5,12 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
-from learner.screen_only import ScreenSelectAndMoveLearner
-from memory.memory import Transition, ReplayMemory, EpisodicMemory
-
 from pysc2.agents import base_agent
 from pysc2.lib import actions
 from pysc2.lib import features
 
-from util.tf_helpers import TFHelper
+from learner.sc2.screen_only import ScreenSelectAndMoveLearner
+from memory.memory import Transition, EpisodicMemory
 
 tfe.enable_eager_execution()
 
@@ -105,6 +103,6 @@ class A2CMoveToBeacon(base_agent.BaseAgent):
     # print("training")
     # s_0, a_0, s_1, r_1, done = self.memory.sample(self.batch_size)
     s_0, a_0, s_1, r_1, done = self.memory.sample()
-    self.brain.train(s_0=s_0, a_0=a_0, s_1=s_1, r_1=r_1, done=done, num_actions=42*42,
+    self.brain.train(s_0=s_0, a_0=a_0, s_1=s_1, r_1=r_1, done=done, num_actions=28*28,
                      p_optimizer=self.action_optimizer, v_optimizer=self.value_optimizer)
 

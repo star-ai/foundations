@@ -34,10 +34,10 @@ from pysc2.lib import stopwatch
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_bool("render", True, "Whether to render with pygame.")
-point_flag.DEFINE_point("feature_screen_size", "42",
+flags.DEFINE_bool("render", False, "Whether to render with pygame.")
+point_flag.DEFINE_point("feature_screen_size", "28",
                         "Resolution for screen feature layers.")
-point_flag.DEFINE_point("feature_minimap_size", "32",
+point_flag.DEFINE_point("feature_minimap_size", "24",
                         "Resolution for minimap feature layers.")
 point_flag.DEFINE_point("rgb_screen_size", None,
                         "Resolution for rendered screen.")
@@ -74,7 +74,7 @@ flags.DEFINE_bool("save_replay", True, "Whether to save a replay at the end.")
 
 # [MoveToBeacon, CollectMineralShards, FindAndDefeatZerglings, DefeatRoaches, DefeatZerglingsAndBanelings
 # CollectMineralsAndGas, BuildMarines]
-flags.DEFINE_string("map", "CollectMineralShards", "Name of a map to use.")
+flags.DEFINE_string("map", "MoveToBeacon", "Name of a map to use.")
 # flags.mark_flag_as_required("map")
 
 
