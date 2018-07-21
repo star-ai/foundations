@@ -19,24 +19,31 @@ import os
 from gym import logger as gymlogger
 
 gymlogger.set_level(40) #error only
-# os.environ["CUDA_VISIBLE_DEVICES"]="-1"  # force no GPU
+os.environ["CUDA_VISIBLE_DEVICES"]="-1"  # force no GPU
 
 
 FLAGS = flags.FLAGS
 flags.DEFINE_bool("render", False, "Whether to render with pygame.")
+flags.DEFINE_bool("test", True, "Whether to do a test run after run loop, only works when parallel=1.")
+flags.DEFINE_integer("test_episodes", 2, "Test episodes.")
 
 flags.DEFINE_integer("max_agent_steps", 0, "Total agent steps.")
 # flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
-flags.DEFINE_integer("max_episodes", 100, "Total episodes.")
+flags.DEFINE_integer("max_episodes", 300, "Total episodes.")
 
 flags.DEFINE_string("agent", "agent.gym.reinforce.REINFORCE",
                     "Which agent to run, as a python path to an Agent class.")
 
-flags.DEFINE_integer("parallel", 10, "How many instances to run in parallel.")
+# Render fails if there are more than 1 instances running in parallel
+flags.DEFINE_integer("parallel", 1, "How many instances to run in parallel.")
 
-#[CartPole-v0]
-flags.DEFINE_string("env", "CartPole-v0", "Name of a env to use.")
-
+"""
+Discrete action envs
+[CartPole-v0, Acrobot-v1, MountainCar-v0, LunarLander-v2]
+Continuous action envs
+[MountainCarContinuous-v0, Pendulum-v0, BipedalWalker-v2, BipedalWalkerHardcore-v2, CarRacing-v0, LunarLanderContinuous-v2]
+"""
+flags.DEFINE_string("env", "Acrobot-v1", "Name of a env to use.")
 
 agent_rewards = []
 
@@ -75,14 +82,37 @@ def run_loop(agent, env, max_steps=0, max_episodes=0):
     pass
   finally:
     elapsed_time = time.time() - start_time
-    print("Took %.3f seconds for %s steps: %.3f sps" % (
+    print("Took %.3f seconds for %s steps: %.3f steps/sec" % (
         elapsed_time, total_steps, total_steps / elapsed_time))
     agent_rewards.append(agent.reward_history)
 
+    if FLAGS.test and FLAGS.parallel == 1:
+      test_agent(agent, env)
 
+
+def test_agent(agent, env):
+  """A run loop to have agents and an environment interact."""
+  for i in range(FLAGS.test_episodes):
+    total_steps = 0
+    try:
+      observation = env.reset()
+      observation = (observation, 0, False)
+      agent.reset()
+      while True:
+        total_steps += 1
+        env.render()
+
+        actions = agent.step(observation)
+        if observation[2] is True: #Done
+          break
+        observation = env.step(actions)
+    finally:
+      print("Test Total Steps:", total_steps, " Reward:", agent.reward)
+  env.close()
 
 def main(unused_argv):
   """Run an agent."""
+  print("Running agent {} in environment {}".format(FLAGS.agent, FLAGS.env))
 
   agent_module, agent_name = FLAGS.agent.rsplit(".", 1)
   agent_class = getattr(importlib.import_module(agent_module), agent_name)

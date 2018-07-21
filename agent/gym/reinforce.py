@@ -1,62 +1,54 @@
 from agent.gym.base_agent import BaseAgent
-from learner.dense import SimpleDenseLearner
+from learner.reinforce import SimpleDenseLearner
 from memory.memory import EpisodicMemory, Transition, Gt
 
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 import numpy as np
 
+from memory.sarsd import SARSD
+
 tfe.enable_eager_execution()
 
 class REINFORCE(BaseAgent):
+  """
+  REINFORCE with a baseline for discrete actions
+  """
   def __init__(self):
     super().__init__()
-    self.optimizer = tf.train.AdamOptimizer(learning_rate=0.1)
-    self.s_0 = None
-    self.a_0 = None
-    self.s_1 = None
-    self.r_1 = None
-    self.done = None
     self.gt = Gt()
+    self.sarsd = SARSD()
 
   def setup(self, observation_space, action_space):
     super().setup(observation_space, action_space)
-    self.learner = SimpleDenseLearner()
+    self.learner = SimpleDenseLearner(nb_actions=action_space.n, learning_rate=0.1)
     self.memory = EpisodicMemory()
+    self.actions = np.arange(self.action_space.n)
 
   def reset(self):
     super().reset()
-    self.s_0 = None
-    self.a_0 = None
-    self.s_1 = None
-    self.r_1 = None
-    self.done = None
+    self.sarsd.reset()
     self.train()
 
 
   def step(self, obs):
     super().step(obs)
-    self.s_1 = obs[0]
-    self.r_1 = obs[1]
-    self.done = obs[2]
+    state = obs[0]
+    reward = obs[1]
+    done = obs[2]
 
-    if self.s_0 is not None and self.a_0 is not None:
-      a = Transition(self.s_0, self.a_0, self.s_1, self.r_1, self.done)
-      self.memory.push(a)
-      self.s_0 = self.s_1
-      self.a_0 = None
+    transition = self.sarsd.observe(state, reward, done)
+    if transition is not None: self.memory.push(transition)
 
-    if self.s_0 is None:
-      self.s_0 = self.s_1
+    action = self.getAction(state)
+    self.sarsd.act(action)
 
-    self.a_0 = self.getAction(self.s_0)
-    return self.a_0
-
+    return action
 
   def getAction(self, s_0):
     s_0 = tf.constant([s_0], dtype=tf.float32)
     action_probability = self.learner(s_0).numpy()
-    action = np.random.choice([0, 1], p=action_probability[0])
+    action = np.random.choice(self.actions, p=action_probability[0])
     return action
 
   def train(self):
@@ -69,5 +61,4 @@ class REINFORCE(BaseAgent):
     baseline = np.expand_dims(baseline, axis=1)
 
     A = r_1 - baseline
-    self.learner.train(s_0=s_0, a_0=a_0, s_1=s_1, r_1=A, done=done, num_actions=self.action_space.n,
-                     p_optimizer=self.optimizer)
+    self.learner.train(s_0=s_0, a_0=a_0, r_1=A)

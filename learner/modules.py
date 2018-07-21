@@ -24,7 +24,7 @@ class DenseModule(tf.keras.Model):
   def __init__(self, units, activation=tf.nn.relu, *args, **kwargs):
     super().__init__(self, *args, **kwargs)
 
-    self.dense = tf.keras.layers.Dense(units, use_bias=False)
+    self.dense = tf.keras.layers.Dense(units, use_bias=False, kernel_regularizer=tf.keras.regularizers.l2)
     self.bn = tf.keras.layers.BatchNormalization()
     self.activation = activation
 

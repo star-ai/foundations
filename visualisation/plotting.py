@@ -16,7 +16,7 @@ def plot_data(data, names):
     std = np.std(series, axis=0)
     axs[i].plot(mu)
     x = np.arange(len(mu))
-    axs[i].fill_between(x, mu - 2*std, mu + 2*std, color='gray', alpha=0.2)
+    axs[i].fill_between(x, mu - 2*std, mu + 1*std, color='gray', alpha=0.2)
 
     axs[i].set_title(names[i])
   fig.tight_layout()

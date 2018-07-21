@@ -1,6 +1,6 @@
 import unittest
 
-from learner.dense import SimpleDenseLearner
+from learner.reinforce import SimpleDenseLearner
 
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
@@ -13,7 +13,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 
 class TestSimpleDenseLearner(unittest.TestCase):
   def setUp(self):
-    self.model = SimpleDenseLearner()
+    self.model = SimpleDenseLearner(nb_actions=2, learning_rate=0.1)
 
   def test_call(self):
     x = tf.random_normal((3, 4))
@@ -25,23 +25,16 @@ class TestSimpleDenseLearner(unittest.TestCase):
     self.assertEqual((3, 2), p.shape)
 
   def test_train(self):
-    """
-    test the full training by passing in a batch of
-     s_0, a, s_1, r, done
-    """
     s_0 = np.random.rand(1, 4)
-    a = np.array([2])
-    s_1 = np.random.rand(1, 4)
+    a = np.array([1])
     r = np.array([[5]])
-    done = np.array([[False]])
-
-    p_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
 
     for i in range(50):
-      self.model.train(s_0, a, s_1, r, done, 2, p_optimizer)
+      self.model.train(s_0, a, r)
 
     s_0 = tf.constant(s_0, dtype=tf.float32)
     p = self.model(s_0)
+    self.assertAlmostEqual(1, p.numpy()[0][1], 1)
 
 
 
