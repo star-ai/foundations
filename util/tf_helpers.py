@@ -39,3 +39,10 @@ class TFHelper():
     """
     indices = tf.constant([[]])
     print(coords, shape)
+
+  @staticmethod
+  def get_action(policy_func, actions, s_0):
+    s_0 = tf.constant([s_0], dtype=tf.float32)
+    action_probability = policy_func(s_0).numpy()
+    action = np.random.choice(actions, p=action_probability[0])
+    return action

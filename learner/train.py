@@ -14,3 +14,13 @@ def train_vanilla_pg_policy(policy_func, model, optimizer, inputs, targets, adva
 
   grads = tape.gradient(final_loss, model.variables)
   optimizer.apply_gradients(zip(grads, model.variables), global_step=tf.train.get_or_create_global_step())
+
+
+def train_vanilla_pg_value(value_func, model, optimizer, inputs, targets):
+  with tfe.GradientTape() as tape:
+    v = value_func(inputs, training=True)
+    loss = tf.losses.mean_squared_error(targets, v)
+    # print("V Loss:", loss)
+
+  grads = tape.gradient(loss, model.variables)
+  optimizer.apply_gradients(zip(grads, model.variables), global_step=tf.train.get_or_create_global_step())

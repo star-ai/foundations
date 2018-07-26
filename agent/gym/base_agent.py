@@ -7,6 +7,7 @@ class BaseAgent(object):
     self.episodes = 0
     self.steps = 0
     self.reward_history = []
+    self.training = True
 
   def setup(self, observation_space, action_space):
     self.action_space = action_space
