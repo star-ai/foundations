@@ -47,9 +47,10 @@ class EpisodicMemory(SimpleBaseMemory):
     A simple memory for storing states for an entire episode and then use the entire trajectory for training
     Rewards for each timestep are the total discounted future rewards according to gamma
   """
-  def __init__(self, gamma=0.99):
+  def __init__(self, gamma=0.99, accum_reward=True):
     self.memory = []
     self.gamma = gamma
+    self.accum_reward = accum_reward
 
   def reset(self):
     self.memory = []
@@ -65,12 +66,14 @@ class EpisodicMemory(SimpleBaseMemory):
     r = np.array(list(batched.r), dtype="float32")
     done = np.expand_dims(np.array(list(batched.done)), axis=1)
 
-    reward = 0.
-    for i in reversed(range(len(r))):
-        moving_reward = self.gamma * reward
-        reward = r[i] + moving_reward
-        r[i] = reward
-        # print(i, len(r)-i-1, r[i])
+    if self.accum_reward:
+      reward = 0.
+      for i in reversed(range(len(r))):
+          moving_reward = self.gamma * reward
+          reward = r[i] + moving_reward
+          r[i] = reward
+          # print(i, len(r)-i-1, r[i])
+
     r = np.expand_dims(r, axis=1)
 
     # clear memory
