@@ -4,7 +4,7 @@ import tensorflow.contrib.eager as tfe
 
 from agent.gym.base_agent import BaseAgent
 from learner.gym.actor_critic import SimpleMCAdvantageAC, SimpleTDLossAC
-from memory.memory import EpisodicMemory, Gt
+from memory.memory import EpisodicMemory
 from memory.sarsd import SARSD
 from util.tf_helpers import TFHelper
 
@@ -16,7 +16,6 @@ class MCActorCritic(BaseAgent):
   """
   def __init__(self):
     super().__init__()
-    self.gt = Gt()
     self.sarsd = SARSD()
 
   def setup(self, observation_space, action_space):
