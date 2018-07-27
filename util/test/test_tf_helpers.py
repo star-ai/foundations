@@ -57,7 +57,11 @@ class TestTFHelper(unittest.TestCase):
     z = TFHelper.coords_to_2D_onehot(y, p.shape)
     print(z)
 
+  def test_get_action(self):
+    def policy_func():
+      return tf.constant([0.1, 0.1, 0.8])
 
+    a = TFHelper.get_action(policy_func, )
 
 if __name__ == "__main__":
   unittest.main()

@@ -29,9 +29,9 @@ flags.DEFINE_integer("test_episodes", 2, "Test episodes.")
 
 flags.DEFINE_integer("max_agent_steps", 0, "Total agent steps.")
 # flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
-flags.DEFINE_integer("max_episodes", 300, "Total episodes.")
+flags.DEFINE_integer("max_episodes", 400, "Total episodes.")
 
-flags.DEFINE_string("agent", "agent.gym.reinforce.REINFORCE",
+flags.DEFINE_string("agent", "agent.gym.actor_critic.TD0ActorCritic",
                     "Which agent to run, as a python path to an Agent class.")
 
 # Render fails if there are more than 1 instances running in parallel
@@ -43,7 +43,7 @@ Discrete action envs
 Continuous action envs
 [MountainCarContinuous-v0, Pendulum-v0, BipedalWalker-v2, BipedalWalkerHardcore-v2, CarRacing-v0, LunarLanderContinuous-v2]
 """
-flags.DEFINE_string("env", "Acrobot-v1", "Name of a env to use.")
+flags.DEFINE_string("env", "LunarLander-v2", "Name of a env to use.")
 
 agent_rewards = []
 
@@ -98,6 +98,7 @@ def test_agent(agent, env):
       observation = env.reset()
       observation = (observation, 0, False)
       agent.reset()
+      agent.training = False
       while True:
         total_steps += 1
         env.render()
