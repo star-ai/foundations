@@ -37,8 +37,9 @@ class TFHelper():
     :param shape: (batch, w, h, 1)
     :return: 
     """
-    indices = tf.constant([[]])
-    print(coords, shape)
+    # indices = tf.constant([[]])
+    # print(coords, shape)
+    pass
 
   @staticmethod
   def get_action(policy_func, actions, s_0):
@@ -46,3 +47,17 @@ class TFHelper():
     action_probability = policy_func(s_0).numpy()
     action = np.random.choice(actions, p=action_probability[0])
     return action
+
+
+  @staticmethod
+  def update_target_model(from_model, target_model, tau):
+    var_from = from_model.variables
+    var_target = target_model.variables
+    # print("var_from", var_from)
+    # print("var_target", var_target)
+    for i in range(len(var_from)):
+      var_target[i].assign(var_target[i] * (1 - tau) + var_from[i] * tau)
+
+    # print("var_target", var_target)
+
+

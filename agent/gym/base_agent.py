@@ -26,3 +26,8 @@ class BaseAgent(object):
     self.reward += obs[1]
     return self.action_space.sample()
 
+  def save(self, filename):
+    print("save not implemented")
+
+  def load(self, filename):
+    print("save not implemented")

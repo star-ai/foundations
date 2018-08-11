@@ -24,14 +24,15 @@ os.environ["CUDA_VISIBLE_DEVICES"]="-1"  # force no GPU
 
 FLAGS = flags.FLAGS
 flags.DEFINE_bool("render", False, "Whether to render with pygame.")
+flags.DEFINE_bool("load", True, "Whether to render with pygame.")
 flags.DEFINE_bool("test", True, "Whether to do a test run after run loop, only works when parallel=1.")
 flags.DEFINE_integer("test_episodes", 2, "Test episodes.")
 
 flags.DEFINE_integer("max_agent_steps", 0, "Total agent steps.")
 # flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
-flags.DEFINE_integer("max_episodes", 400, "Total episodes.")
+flags.DEFINE_integer("max_episodes", 20, "Total episodes.")
 
-flags.DEFINE_string("agent", "agent.gym.actor_critic.TD0ActorCritic",
+flags.DEFINE_string("agent", "agent.gym.dpg.DPGActorCritic",
                     "Which agent to run, as a python path to an Agent class.")
 
 # Render fails if there are more than 1 instances running in parallel
@@ -43,7 +44,7 @@ Discrete action envs
 Continuous action envs
 [MountainCarContinuous-v0, Pendulum-v0, BipedalWalker-v2, BipedalWalkerHardcore-v2, CarRacing-v0, LunarLanderContinuous-v2]
 """
-flags.DEFINE_string("env", "LunarLander-v2", "Name of a env to use.")
+flags.DEFINE_string("env", "Pendulum-v0", "Name of a env to use.")
 
 agent_rewards = []
 
@@ -60,15 +61,21 @@ def run_loop(agent, env, max_steps=0, max_episodes=0):
   start_time = time.time()
 
   agent.setup(env.observation_space, env.action_space)
+  filename = "../data/" + FLAGS.agent + "_" + FLAGS.env + ".h5"
+  if FLAGS.load and FLAGS.parallel == 1 and os.path.isfile(filename):
+    agent.load(filename)
 
   try:
     while not max_episodes or total_episodes < max_episodes:
       total_episodes += 1
+      if (total_episodes + 1) % 1000 == 0: print("Episode:", total_episodes+1)
       observation = env.reset()
       observation = (observation, 0, False)
       agent.reset()
       while True:
-        total_steps += 1
+        if observation[2] is False:
+          total_steps += 1
+
         if FLAGS.render:
           env.render()
 
@@ -76,6 +83,7 @@ def run_loop(agent, env, max_steps=0, max_episodes=0):
         if max_steps and total_steps >= max_steps:
           break
         if observation[2] is True: #Done
+          print("Episode:", total_episodes, "Total_steps:", total_steps, "Reward:", agent.reward)
           break
         observation = env.step(actions)
   except KeyboardInterrupt:
@@ -83,10 +91,11 @@ def run_loop(agent, env, max_steps=0, max_episodes=0):
   finally:
     elapsed_time = time.time() - start_time
     print("Took %.3f seconds for %s steps: %.3f steps/sec" % (
-        elapsed_time, total_steps, total_steps / elapsed_time))
+      elapsed_time, total_steps, total_steps / elapsed_time))
     agent_rewards.append(agent.reward_history)
 
     if FLAGS.test and FLAGS.parallel == 1:
+      # agent.save(FLAGS.agent + "_" + FLAGS.env)
       test_agent(agent, env)
 
 
