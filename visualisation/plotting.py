@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def plot_data(data, names):
+  if np.array(data).size == 0:
+    return
+
   plots = len(data)
 
   fig, axs = plt.subplots(plots, 1)
