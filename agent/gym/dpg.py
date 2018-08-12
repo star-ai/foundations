@@ -53,11 +53,11 @@ class DPGActorCritic(BaseAgent):
 
     return action
 
-  # def save(self, filename):
-  #   self.learner.save(filename)
-  #
-  # def load(self, filename):
-  #   self.learner.load(filename)
+  def save(self, name):
+    self.learner.save(name)
+
+  def load(self, name):
+    self.learner.load(name)
 
   def getAction(self, s_0):
     return self.learner.getAction(s_0, self.training)

@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 import tensorflow.contrib.eager as tfe
 from learner.gym.dpg import SimpleDPGActorCritic, SimplePolicy
+from util.tf_helpers import TFHelper
 
 tfe.enable_eager_execution()
 import os
@@ -103,21 +104,27 @@ class TestDDPG(unittest.TestCase):
     a_0 = tf.constant([[0.5, -0.5]])
 
     self.model = SimpleDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
-
     optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
-    checkpoint_dir = "./data/test"
 
-    checkpoint_prefix = os.path.join(checkpoint_dir, "test_ckpt")
-    root = tfe.Checkpoint(optimizer=optimizer,
-                          model=self.model,
-                          optimizer_step=tf.train.get_or_create_global_step())
+    y_p = self.model.P(s_0)
+    y_q = self.model.Q([s_0, a_0])
 
-    self.model.P(s_0)
-    self.model.Q([s_0, a_0])
+    # print(y_p, y_q)
 
-    root.save(file_prefix=checkpoint_prefix)
+    TFHelper.save_eager("unittest_ddpg", self.model)
 
-    root.restore(tf.train.latest_checkpoint(checkpoint_dir))
+    self.model = SimpleDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+
+    TFHelper.load_eager("unittest_ddpg", self.model)
+
+    self.assertEqual(y_p, self.model.P(s_0))
+    self.assertEqual(y_q, self.model.Q([s_0, a_0]))
+
+    y_p = self.model.P(s_0)
+    y_q = self.model.Q([s_0, a_0])
+    #
+    print(y_p, y_q)
 
 if __name__ == '__main__':
     unittest.main()

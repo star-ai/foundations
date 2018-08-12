@@ -1,5 +1,9 @@
 import tensorflow as tf
+import tensorflow.contrib.eager as tfe
 import numpy as np
+import os
+
+
 class TFHelper():
 
   @staticmethod
@@ -60,4 +64,25 @@ class TFHelper():
 
     # print("var_target", var_target)
 
+  @staticmethod
+  def save_eager(name, model, optimizer=None):
+    checkpoint_dir = "./data/" + name
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    checkpoint_prefix = os.path.join(checkpoint_dir, name + "_ckpt")
+    if optimizer:
+      root = tfe.Checkpoint(optimizer=optimizer, model=model)
+    else:
+      root = tfe.Checkpoint(model=model)
 
+    root.save(file_prefix=checkpoint_prefix)
+
+  @staticmethod
+  def load_eager(name, model, optimizer=None):
+    checkpoint_dir = "./data/" + name
+    checkpoint_prefix = os.path.join(checkpoint_dir, name + "_ckpt")
+    if optimizer:
+      root = tfe.Checkpoint(optimizer=optimizer, model=model)
+    else:
+      root = tfe.Checkpoint(model=model)
+
+    root.restore(tf.train.latest_checkpoint(checkpoint_dir))

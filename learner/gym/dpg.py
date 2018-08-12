@@ -130,12 +130,15 @@ class DoubleSimpleDPGActorCritic():
     action = self.learner.P(s_0, training=training).numpy()
     return np.squeeze(action, axis=0)
 
-  # def save(self, filename):
-  #   self.learner.save(filename)
-  #
-  # def load(self, filename):
-  #   self.learner = tf.keras.models.load_model(filename)
-    # self.learner_target.load_weights(filename)
+  def save(self, name):
+    TFHelper.save_eager(name, self.learner, self.learner.optimizer)
+    # TFHelper.save_eager(name + "/learner", self.learner, self.learner.optimizer)
+    # TFHelper.save_eager(name + "/target", self.learner_target)
+
+  def load(self, name):
+    TFHelper.load_eager(name, self.learner, self.learner.optimizer)
+    # TFHelper.load_eager(name + "/learner", self.learner, self.learner.optimizer)
+    # TFHelper.load_eager(name + "/target", self.learner_target)
 
   def train(self, s_0, a_0, s_1, r_1, done):
     s_0 = tf.constant(s_0, dtype=tf.float32)

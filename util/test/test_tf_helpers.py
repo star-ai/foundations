@@ -102,5 +102,27 @@ class TestTFHelper(unittest.TestCase):
     self.assertEqual(model_b.get_weights()[0][0], original_weight * 0.8 + (original_weight + 1) * 0.2)
 
 
+  # @unittest.skip
+  def test_save(self):
+    x = tf.constant([[1., 1., 1., 1.]])
+
+    model = SimpleModel()
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+
+    y = model(x)
+
+    TFHelper.save_eager("unittest_save", model, optimizer)
+
+    model = SimpleModel()
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+
+    self.assertNotEqual(y, model(x))
+
+    TFHelper.load_eager("unittest_save", model, optimizer)
+
+    self.assertNotEqual(y, model(x))
+
+
+
 if __name__ == "__main__":
   unittest.main()

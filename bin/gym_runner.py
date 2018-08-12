@@ -26,11 +26,11 @@ FLAGS = flags.FLAGS
 flags.DEFINE_bool("render", False, "Whether to render with pygame.")
 flags.DEFINE_bool("load", True, "Whether to render with pygame.")
 flags.DEFINE_bool("test", True, "Whether to do a test run after run loop, only works when parallel=1.")
-flags.DEFINE_integer("test_episodes", 2, "Test episodes.")
+flags.DEFINE_integer("test_episodes", 0, "Test episodes.")
 
 flags.DEFINE_integer("max_agent_steps", 0, "Total agent steps.")
 # flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
-flags.DEFINE_integer("max_episodes", 20, "Total episodes.")
+flags.DEFINE_integer("max_episodes", 40, "Total episodes.")
 
 flags.DEFINE_string("agent", "agent.gym.dpg.DPGActorCritic",
                     "Which agent to run, as a python path to an Agent class.")
@@ -61,9 +61,10 @@ def run_loop(agent, env, max_steps=0, max_episodes=0):
   start_time = time.time()
 
   agent.setup(env.observation_space, env.action_space)
-  filename = "../data/" + FLAGS.agent + "_" + FLAGS.env + ".h5"
-  if FLAGS.load and FLAGS.parallel == 1 and os.path.isfile(filename):
-    agent.load(filename)
+  save_name = "" + FLAGS.agent + "_" + FLAGS.env
+  if FLAGS.load and FLAGS.parallel == 1 and os.path.isdir("data/" + save_name):
+    print("loading:", save_name)
+    agent.load(save_name)
 
   try:
     while not max_episodes or total_episodes < max_episodes:
@@ -94,9 +95,11 @@ def run_loop(agent, env, max_steps=0, max_episodes=0):
       elapsed_time, total_steps, total_steps / elapsed_time))
     agent_rewards.append(agent.reward_history)
 
-    if FLAGS.test and FLAGS.parallel == 1:
-      # agent.save(FLAGS.agent + "_" + FLAGS.env)
-      test_agent(agent, env)
+    if FLAGS.parallel == 1:
+      print("saving:", save_name)
+      agent.save(save_name)
+      if FLAGS.test:
+        test_agent(agent, env)
 
 
 def test_agent(agent, env):
