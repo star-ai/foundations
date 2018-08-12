@@ -3,7 +3,7 @@ import unittest
 import tensorflow as tf
 import numpy as np
 import tensorflow.contrib.eager as tfe
-from learner.gym.dpg import SimpleDPGActorCritic, SimplePolicy
+from learner.gym.ddpg import SimpleDPGActorCritic, SimplePolicy
 from util.tf_helpers import TFHelper
 
 tfe.enable_eager_execution()

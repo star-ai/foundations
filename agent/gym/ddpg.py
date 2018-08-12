@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
 from agent.gym.base_agent import BaseAgent
-from learner.gym.dpg import DoubleSimpleDPGActorCritic
+from learner.gym.ddpg import DoubleSimpleDPGActorCritic
 from learner.train import train_vanilla_pg_policy, train_vanilla_pg_value
 from memory.memory import ReplayMemory, EpisodicMemory
 from memory.sarsd import SARSD
