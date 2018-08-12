@@ -30,9 +30,9 @@ flags.DEFINE_integer("test_episodes", 0, "Test episodes.")
 
 flags.DEFINE_integer("max_agent_steps", 0, "Total agent steps.")
 # flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
-flags.DEFINE_integer("max_episodes", 40, "Total episodes.")
+flags.DEFINE_integer("max_episodes", 500, "Total episodes.")
 
-flags.DEFINE_string("agent", "agent.gym.dpg.DPGActorCritic",
+flags.DEFINE_string("agent", "agent.gym.ddpg.DPGActorCritic",
                     "Which agent to run, as a python path to an Agent class.")
 
 # Render fails if there are more than 1 instances running in parallel
@@ -44,7 +44,7 @@ Discrete action envs
 Continuous action envs
 [MountainCarContinuous-v0, Pendulum-v0, BipedalWalker-v2, BipedalWalkerHardcore-v2, CarRacing-v0, LunarLanderContinuous-v2]
 """
-flags.DEFINE_string("env", "Pendulum-v0", "Name of a env to use.")
+flags.DEFINE_string("env", "MountainCarContinuous-v0", "Name of a env to use.")
 
 agent_rewards = []
 
@@ -98,8 +98,9 @@ def run_loop(agent, env, max_steps=0, max_episodes=0):
     if FLAGS.parallel == 1:
       print("saving:", save_name)
       agent.save(save_name)
-      if FLAGS.test:
-        test_agent(agent, env)
+
+  if FLAGS.parallel == 1 and FLAGS.test:
+    test_agent(agent, env)
 
 
 def test_agent(agent, env):
