@@ -18,8 +18,13 @@ class TestGymEnvs(unittest.TestCase):
         print("Episode finished after {} timesteps".format(t + 1))
         break
 
+  @unittest.skip
   def test_pendulum(self):
     self.run_env("Pendulum-v0")
+
+  @unittest.skip
+  def test_pendulum(self):
+    self.run_env("MountainCarContinuous-v0")
 
 
 if __name__ == '__main__':

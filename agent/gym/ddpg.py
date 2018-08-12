@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
 from agent.gym.base_agent import BaseAgent
-from learner.gym.ddpg import DoubleSimpleDPGActorCritic
+from learner.gym.ddpg import DoubleSimpleDDPGActorCritic
 from learner.train import train_vanilla_pg_policy, train_vanilla_pg_value
 from memory.memory import ReplayMemory, EpisodicMemory
 from memory.sarsd import SARSD
@@ -11,7 +11,7 @@ from util.tf_helpers import TFHelper
 
 tfe.enable_eager_execution()
 
-class DPGActorCritic(BaseAgent):
+class DDPGActorCritic(BaseAgent):
   """
     Monte Carlo actor critic
   """
@@ -23,9 +23,9 @@ class DPGActorCritic(BaseAgent):
     super().setup(observation_space, action_space)
     print(action_space.shape, action_space.high, action_space.low)
     self.num_actions = action_space.shape[0]
-    self.learner = DoubleSimpleDPGActorCritic(nb_actions=self.num_actions, action_high=action_space.high,
-                                        action_low=action_space.low,
-                                        actor_lr=0.0001, critic_lr=0.001, gamma=0.99, tau=0.01)
+    self.learner = DoubleSimpleDDPGActorCritic(nb_actions=self.num_actions, action_high=action_space.high,
+                                               action_low=action_space.low,
+                                               actor_lr=0.0001, critic_lr=0.001, gamma=0.99, tau=0.01)
 
     # self.memory = EpisodicMemory(gamma=0.99, accum_reward=False)
     self.memory = ReplayMemory(capacity=1000000)
@@ -33,7 +33,8 @@ class DPGActorCritic(BaseAgent):
   def reset(self):
     super().reset()
     self.sarsd.reset()
-    self.train()
+    if self.training:
+      self.train()
 
 
   def step(self, obs):
@@ -64,7 +65,7 @@ class DPGActorCritic(BaseAgent):
 
 
   def train(self):
-    if len(self.memory) <= 1000:
+    if len(self.memory) <= 20000:
       return
 
     for i in range(1):

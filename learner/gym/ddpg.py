@@ -72,7 +72,7 @@ class SimpleQ(tf.keras.Model):
     return q
 
 
-class SimpleDPGActorCritic(tf.keras.Model):
+class SimpleDDPGActorCritic(tf.keras.Model):
   """
     
   """
@@ -116,14 +116,14 @@ class SimpleDPGActorCritic(tf.keras.Model):
 
 
 
-class DoubleSimpleDPGActorCritic():
+class DoubleSimpleDDPGActorCritic():
   def __init__(self, nb_actions=1, action_high=[1], action_low=[-1], actor_lr=0.01, critic_lr=0.01, gamma=0.99,
                tau=0.01, *args, **kwargs):
     self.tau = tau
-    self.learner = SimpleDPGActorCritic(nb_actions=nb_actions, action_high=action_high, action_low=action_low,
-                                        actor_lr=actor_lr, critic_lr=critic_lr, gamma=gamma)
-    self.learner_target = SimpleDPGActorCritic(nb_actions=nb_actions, action_high=action_high, action_low=action_low,
-                                        actor_lr=actor_lr, critic_lr=critic_lr, gamma=gamma)
+    self.learner = SimpleDDPGActorCritic(nb_actions=nb_actions, action_high=action_high, action_low=action_low,
+                                         actor_lr=actor_lr, critic_lr=critic_lr, gamma=gamma)
+    self.learner_target = SimpleDDPGActorCritic(nb_actions=nb_actions, action_high=action_high, action_low=action_low,
+                                                actor_lr=actor_lr, critic_lr=critic_lr, gamma=gamma)
 
   def getAction(self, s_0, training=False):
     s_0 = tf.constant([s_0], dtype=tf.float32)

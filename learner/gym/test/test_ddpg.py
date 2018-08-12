@@ -3,7 +3,7 @@ import unittest
 import tensorflow as tf
 import numpy as np
 import tensorflow.contrib.eager as tfe
-from learner.gym.ddpg import SimpleDPGActorCritic, SimplePolicy
+from learner.gym.ddpg import SimpleDDPGActorCritic, SimplePolicy
 from util.tf_helpers import TFHelper
 
 tfe.enable_eager_execution()
@@ -39,7 +39,7 @@ class TestSimplePolicy(unittest.TestCase):
 class TestDDPG(unittest.TestCase):
 
   def test_call_policy(self):
-    self.model = SimpleDPGActorCritic(2, action_high=[2, 1], action_low=[-6, -1])
+    self.model = SimpleDDPGActorCritic(2, action_high=[2, 1], action_low=[-6, -1])
 
     x = tf.random_normal((3, 4))
     p = self.model.P(x).numpy()
@@ -51,7 +51,7 @@ class TestDDPG(unittest.TestCase):
     self.assertEqual(p.shape, (3, 2))
 
   def test_call_Q(self):
-    self.model = SimpleDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
+    self.model = SimpleDDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
 
     x = tf.random_normal((3, 4))
     a = tf.random_normal((3, 2))
@@ -84,11 +84,11 @@ class TestDDPG(unittest.TestCase):
     s_0 = tf.constant([[1., 1., 1., 1.]])
     a_0 = tf.constant([[0.5, -0.5]])
 
-    self.model = SimpleDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
+    self.model = SimpleDDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
     self.model.P(s_0)
     self.model.Q([s_0, a_0])
 
-    self.target = SimpleDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
+    self.target = SimpleDDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
 
     if len(self.target.variables) == 0:
       # if variables are not initialized then initialize it and set weights to be
@@ -103,7 +103,7 @@ class TestDDPG(unittest.TestCase):
     s_0 = tf.constant([[1., 1., 1., 1.]])
     a_0 = tf.constant([[0.5, -0.5]])
 
-    self.model = SimpleDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
+    self.model = SimpleDDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
     optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
 
     y_p = self.model.P(s_0)
@@ -113,7 +113,7 @@ class TestDDPG(unittest.TestCase):
 
     TFHelper.save_eager("unittest_ddpg", self.model)
 
-    self.model = SimpleDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
+    self.model = SimpleDDPGActorCritic(2, action_high=[1, 1], action_low=[-1, -1])
     optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
 
     TFHelper.load_eager("unittest_ddpg", self.model)
