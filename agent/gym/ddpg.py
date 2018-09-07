@@ -46,8 +46,8 @@ class DDPGActorCritic(BaseAgent):
     transition = self.sarsd.observe(state, reward, done)
     if transition is not None: self.memory.push(transition)
 
-    if self.training:
-      self.train()
+    # if self.training:
+    #   self.train()
 
     action = self.getAction(state)
     self.sarsd.act(action)
@@ -68,7 +68,7 @@ class DDPGActorCritic(BaseAgent):
     if len(self.memory) <= 20000:
       return
 
-    for i in range(1):
+    for i in range(100):
       s_0, a_0, s_1, r_1, done = self.memory.sample(batch_size=64)
       self.learner.train(s_0=s_0, a_0=a_0, s_1=s_1, r_1=r_1, done=done)
 

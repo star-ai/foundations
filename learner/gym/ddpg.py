@@ -141,11 +141,7 @@ class DoubleSimpleDDPGActorCritic():
     # TFHelper.load_eager(name + "/target", self.learner_target)
 
   def train(self, s_0, a_0, s_1, r_1, done):
-    s_0 = tf.constant(s_0, dtype=tf.float32)
-    a_0 = tf.constant(a_0, dtype=tf.float32)
-    s_1 = tf.constant(s_1, dtype=tf.float32)
-    r_1 = tf.constant(r_1, dtype=tf.float32)
-    done = tf.constant(1-done, dtype=tf.float32)
+    s_0, a_0, s_1, r_1, done = TFHelper.convert_to_constant(s_0, a_0, s_1, r_1, 1-done)
 
     if len(self.learner_target.variables) == 0:
       # if variables are not initialized then initialize it and set weights to be

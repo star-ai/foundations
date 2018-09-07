@@ -52,6 +52,10 @@ class TFHelper():
     action = np.random.choice(actions, p=action_probability[0])
     return action
 
+  @staticmethod
+  def convert_to_constant(*args):
+    return tuple([tf.constant(var, dtype=tf.float32) for var in args])
+
 
   @staticmethod
   def update_target_model(from_model, target_model, tau):

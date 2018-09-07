@@ -25,13 +25,13 @@ os.environ["CUDA_VISIBLE_DEVICES"]="-1"  # force no GPU
 FLAGS = flags.FLAGS
 flags.DEFINE_bool("render", False, "Whether to render with pygame.")
 flags.DEFINE_bool("load", True, "Whether to render with pygame.")
-flags.DEFINE_bool("train", True, "Whether to train.")
+flags.DEFINE_bool("train", False, "Whether to train.")
 flags.DEFINE_bool("test", True, "Whether to do a test run after run loop, only works when parallel=1.")
 flags.DEFINE_integer("test_episodes", 2, "Test episodes.")
 
 flags.DEFINE_integer("max_agent_steps", 0, "Total agent steps.")
 # flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
-flags.DEFINE_integer("max_episodes", 150, "Total episodes.")
+flags.DEFINE_integer("max_episodes", 1500, "Total episodes.")
 
 flags.DEFINE_string("agent", "agent.gym.ddpg.DDPGActorCritic",
                     "Which agent to run, as a python path to an Agent class.")
@@ -45,7 +45,7 @@ Discrete action envs
 Continuous action envs
 [MountainCarContinuous-v0, Pendulum-v0, BipedalWalker-v2, BipedalWalkerHardcore-v2, CarRacing-v0, LunarLanderContinuous-v2]
 """
-flags.DEFINE_string("env", "Pendulum-v0", "Name of a env to use.")
+flags.DEFINE_string("env", "LunarLanderContinuous-v2", "Name of a env to use.")
 
 agent_rewards = []
 

@@ -5,9 +5,24 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 import os
+from functools import wraps
+from time import time
 
 tfe.enable_eager_execution()
 os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+
+
+def measure(func):
+  @wraps(func)
+  def _time_it(*args, **kwargs):
+    start = int(round(time() * 1000))
+    try:
+      return func(*args, **kwargs)
+    finally:
+      end_ = int(round(time() * 1000)) - start
+      print("Total execution time: {:f} ms".format(end_ if end_ > 0 else 0))
+
+  return _time_it
 
 
 class SimpleModel(tf.keras.Model):
@@ -73,8 +88,17 @@ class TestTFHelper(unittest.TestCase):
     a = TFHelper.get_action(policy_func, np.arange(3), [0])
     self.assertEqual(a, 2)
 
+  def test_convert_to_constant(self):
+    a = np.array([1, 1])
+    b = np.array([2, 2])
+    c = np.array([3, 3])
 
-  def test_copy_weights(self):
+    x, y, z = TFHelper.convert_to_constant(a, b, c)
+    # print(x, y, z)
+    self.assertEqual(x.numpy()[0], 1)
+
+
+  def test_update_target_model(self):
 
     x = tf.random_normal((1, 2))
 
@@ -100,6 +124,8 @@ class TestTFHelper(unittest.TestCase):
 
     original_weight = original_weights[0][0]
     self.assertEqual(model_b.get_weights()[0][0], original_weight * 0.8 + (original_weight + 1) * 0.2)
+
+
 
 
   # @unittest.skip
