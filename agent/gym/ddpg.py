@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
-from agent.gym.base_agent import BaseAgent
+from agent.gym.base_agent import BaseAgent, RLAgent
 from learner.gym.ddpg import DoubleSimpleDDPGActorCritic
 from learner.train import train_vanilla_pg_policy, train_vanilla_pg_value
 from memory.memory import ReplayMemory, EpisodicMemory
@@ -11,14 +11,10 @@ from util.tf_helpers import TFHelper
 
 tfe.enable_eager_execution()
 
-class DDPGActorCritic(BaseAgent):
+class DDPGActorCritic(RLAgent):
   """
     Monte Carlo actor critic
   """
-  def __init__(self):
-    super().__init__()
-    self.sarsd = SARSD()
-
   def setup(self, observation_space, action_space):
     super().setup(observation_space, action_space)
     print(action_space.shape, action_space.high, action_space.low)
@@ -29,30 +25,6 @@ class DDPGActorCritic(BaseAgent):
 
     # self.memory = EpisodicMemory(gamma=0.99, accum_reward=False)
     self.memory = ReplayMemory(capacity=1000000)
-
-  def reset(self):
-    super().reset()
-    self.sarsd.reset()
-    if self.training:
-      self.train()
-
-
-  def step(self, obs):
-    super().step(obs)
-    state = obs[0]
-    reward = obs[1]
-    done = obs[2]
-
-    transition = self.sarsd.observe(state, reward, done)
-    if transition is not None: self.memory.push(transition)
-
-    # if self.training:
-    #   self.train()
-
-    action = self.getAction(state)
-    self.sarsd.act(action)
-
-    return action
 
   def save(self, name):
     self.learner.save(name)

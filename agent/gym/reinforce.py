@@ -2,47 +2,27 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
-from agent.gym.base_agent import BaseAgent
+from agent.gym.base_agent import BaseAgent, RLAgent
 from learner.gym.reinforce import SimpleDenseLearner
 from memory.memory import EpisodicMemory, Gt
 from memory.sarsd import SARSD
+from util.tf_helpers import TFHelper
 
 tfe.enable_eager_execution()
 
-class REINFORCE(BaseAgent):
+class REINFORCE(RLAgent):
   """
   REINFORCE with a baseline for discrete actions
   """
   def __init__(self):
     super().__init__()
     self.gt = Gt()
-    self.sarsd = SARSD()
 
   def setup(self, observation_space, action_space):
     super().setup(observation_space, action_space)
     self.learner = SimpleDenseLearner(nb_actions=action_space.n, learning_rate=0.1)
     self.memory = EpisodicMemory()
     self.actions = np.arange(self.action_space.n)
-
-  def reset(self):
-    super().reset()
-    self.sarsd.reset()
-    self.train()
-
-
-  def step(self, obs):
-    super().step(obs)
-    state = obs[0]
-    reward = obs[1]
-    done = obs[2]
-
-    transition = self.sarsd.observe(state, reward, done)
-    if transition is not None: self.memory.push(transition)
-
-    action = self.getAction(state)
-    self.sarsd.act(action)
-
-    return action
 
   def getAction(self, s_0):
     s_0 = tf.constant([s_0], dtype=tf.float32)
