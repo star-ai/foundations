@@ -24,6 +24,10 @@ class ReplayMemory(SimpleBaseMemory):
     self.memory = []
     self.position = 0
 
+  def reset(self):
+    self.memory = []
+    self.position = 0
+
   def push(self, item):
     """Saves a transition."""
     if len(self.memory) < self.capacity:
@@ -31,7 +35,7 @@ class ReplayMemory(SimpleBaseMemory):
     self.memory[self.position] = item
     self.position = (self.position + 1) % self.capacity
 
-  def sample(self, batch_size):
+  def sample(self, batch_size=32):
     out = random.sample(self.memory, batch_size)
     batched = Transition(*zip(*out))
     s = np.array(list(batched.s))
@@ -41,6 +45,11 @@ class ReplayMemory(SimpleBaseMemory):
     done = np.expand_dims(np.array(list(batched.done)), axis=1)
     return [s, a, s_1, r, done]
 
+class ReplayOnceMemory(ReplayMemory):
+  def sample(self):
+    samples = super().sample(len(self.memory))
+    self.reset()
+    return samples
 
 class EpisodicMemory(SimpleBaseMemory):
   """

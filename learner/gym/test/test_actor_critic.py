@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
-from learner.gym.actor_critic import SimpleMCAdvantageAC
+from learner.gym.actor_critic import SimpleMCPolicyGradientWithBaseline
 
 tfe.enable_eager_execution()
 import os
@@ -13,7 +13,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 
 class TestSimpleMCAdvantageAC(unittest.TestCase):
   def setUp(self):
-    self.model = SimpleMCAdvantageAC(nb_actions=3)
+    self.model = SimpleMCPolicyGradientWithBaseline(nb_actions=3)
 
   def test_call(self):
     x = tf.random_normal((3, 4))

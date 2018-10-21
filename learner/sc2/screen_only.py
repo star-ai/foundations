@@ -2,98 +2,80 @@ import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
 from learner.modules import ConvModule, DenseModule, softmax2D
-
+from learner.train import train_vanilla_pg_policy, train_vanilla_pg_value
 """
 Assuming 84x84x17 screen input
 and only produces a click_move output on screen
 """
 class ScreenSelectAndMoveLearner(tf.keras.Model):
-  def __init__(self, gamma=0.99, *args, **kwargs):
+  def __init__(self, learning_rate=0.001, gamma=0.99, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.gamma = gamma
 
-    self.core_conv1 = ConvModule(32)
-    self.core_conv2 = ConvModule(32)
-    self.core_conv_final = ConvModule(8)
+    self.core_conv1 = tf.keras.layers.Conv2D(32, kernel_size=(3,3), padding="same", activation=tf.nn.relu)
+    self.core_conv2 = tf.keras.layers.Conv2D(32, kernel_size=(3,3), padding="same", activation=tf.nn.relu)
+    self.core_conv_final = tf.keras.layers.Conv2D(8, kernel_size=(3,3), padding="same", activation=tf.nn.relu)
 
-    self.policy1 = ConvModule(1, activation=None)
+    self.policy1 = tf.keras.layers.Conv2D(1, kernel_size=(3,3), padding="same", activation=None)
 
-    self.value0 = ConvModule(1) #84*84
+    self.value0 = tf.keras.layers.Conv2D(1, kernel_size=(3,3), padding="same", activation=tf.nn.relu)
     self.flatten = tf.keras.layers.Flatten()
-    self.value1 = DenseModule(1024)
-    self.value2 = DenseModule(128)
-    self.value3 = DenseModule(32)
-    self.value4 = DenseModule(1, activation=None)
+    self.value1 = tf.keras.layers.Dense(units=128, kernel_regularizer=tf.keras.regularizers.l2, activation=tf.nn.relu)
+    self.value2 = tf.keras.layers.Dense(units=128, kernel_regularizer=tf.keras.regularizers.l2, activation=tf.nn.relu)
+    self.value3 = tf.keras.layers.Dense(units=32, kernel_regularizer=tf.keras.regularizers.l2, activation=tf.nn.relu)
+    self.value4 = tf.keras.layers.Dense(units=1, kernel_regularizer=tf.keras.regularizers.l2, activation=None)
 
+    self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
-  def call(self, inputs, training=False):
+  def call(self, inputs):
     """
-    Bit of a redundancy when it calls the model here as it's doing both the the policy and value
-    
     :param inputs: state
     :param training: whether we're in training mode
     :return: 
     """
-    core = self.core_conv1(inputs, training=training)
-    core = self.core_conv2(core, training=training)
-    core = self.core_conv_final(core, training=training)
-
-    policy = self.policy1(core, training=training)
-    policy = tf.reshape(policy, (policy.shape[0], -1))
-    policy = tf.nn.softmax(policy)
-
-    value = self.value0(core, training=training)
-    value = self.flatten(value)
-    value = self.value1(value, training=training)
-    value = self.value2(value, training=training)
-    value = self.value3(value, training=training)
-    value = self.value4(value, training=training)
-
+    policy = self.P(inputs)
+    value = self.V(inputs)
     return policy, value
 
+  def P(self, inputs, training=False):
+    core = self.core_conv1(inputs)
+    core = self.core_conv2(core)
+    core = self.core_conv_final(core)
 
-  def train_policy(self, optimizer, inputs, targets, advantage):
-    with tfe.GradientTape() as tape:
-      p, v = self(inputs, training=True)
-      """p shape and target shape must be the same"""
-      p = tf.clip_by_value(p, 1e-6, 0.999999)
-      loss = p * tf.cast(targets, dtype=tf.float32)
-      loss = tf.reshape(loss, (p.shape[0], -1))
-      loss = tf.reduce_sum(loss, reduction_indices=1)
-      loss = tf.log(loss)
+    policy = self.policy1(core)
+    policy = tf.reshape(policy, (policy.shape[0], -1))
+    policy = tf.nn.softmax(policy)
+    return policy
 
-      print("P Loss:", tf.reduce_sum(loss))
-      final_loss = -tf.reduce_mean(loss * advantage)
+  def V(self, inputs, training=False):
+    core = self.core_conv1(inputs)
+    core = self.core_conv2(core)
+    core = self.core_conv_final(core)
 
-    grads = tape.gradient(final_loss, self.variables)
-    optimizer.apply_gradients(zip(grads, self.variables), global_step=tf.train.get_or_create_global_step())
+    value = self.value0(core)
+    value = self.flatten(value)
+    value = self.value1(value)
+    # value = self.value2(value)
+    value = self.value3(value)
+    value = self.value4(value)
+    return value
 
-
-
-  def train_value(self, optimizer, inputs, targets):
-    with tfe.GradientTape() as tape:
-      p, v = self(inputs, training=True)
-      loss = tf.losses.mean_squared_error(targets, v)
-      print("V Loss:", loss)
-
-    grads = tape.gradient(loss, self.variables)
-    optimizer.apply_gradients(zip(grads, self.variables), global_step=tf.train.get_or_create_global_step())
-
-  def train(self, s_0, a_0, s_1, r_1, done, num_actions, p_optimizer, v_optimizer):
+  def train(self, s_0, a_0, s_1, r_t, done, num_actions):
     s_0 = tf.constant(s_0, dtype=tf.float32)
     a_0 = tf.one_hot(a_0, depth=num_actions, dtype=tf.float32)
     s_1 = tf.constant(s_1, dtype=tf.float32)
-    r_1 = tf.constant(r_1, dtype=tf.float32)
+    r_t = tf.constant(r_t, dtype=tf.float32)
     done = tf.constant(1-done, dtype=tf.float32)
 
-    p, v_0 = self(s_0)
-    p, v_1 = self(s_1)
+    v_0 = self.V(s_0)
+    v_1 = self.V(s_1)
 
     # Q_pi(s,a)
-    Q = r_1 #+ self.gamma * done * v_1
+    Q = r_t + self.gamma * done * v_1
 
     # TD_error
-    A = Q - v_0
+    Adv = Q - v_0
 
-    self.train_value(v_optimizer, s_0, Q)
-    self.train_policy(p_optimizer, s_0, a_0, A)
+    train_vanilla_pg_value(self.V, self, self.optimizer, s_0, Q)
+    train_vanilla_pg_policy(self.P, self, self.optimizer, s_0, a_0, Adv)
+

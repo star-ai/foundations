@@ -31,9 +31,9 @@ flags.DEFINE_integer("test_episodes", 2, "Test episodes.")
 
 flags.DEFINE_integer("max_agent_steps", 0, "Total agent steps.")
 # flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
-flags.DEFINE_integer("max_episodes", 150, "Total episodes.")
+flags.DEFINE_integer("max_episodes", 10000, "Total episodes.")
 from  agent.gym.ddpg import DDPGActorCritic
-flags.DEFINE_string("agent", "agent.gym.ddpg.DDPGActorCritic",
+flags.DEFINE_string("agent", "agent.gym.actor_critic.TD0ActorCritic",
                     "Which agent to run, as a python path to an Agent class.")
 
 # Render fails if there are more than 1 instances running in parallel
@@ -45,7 +45,7 @@ Discrete action envs
 Continuous action envs
 [MountainCarContinuous-v0, Pendulum-v0, BipedalWalker-v2, BipedalWalkerHardcore-v2, CarRacing-v0, LunarLanderContinuous-v2]
 """
-flags.DEFINE_string("env", "Pendulum-v0", "Name of a env to use.")
+flags.DEFINE_string("env", "Acrobot-v1", "Name of a env to use.")
 
 agent_rewards = []
 
@@ -92,7 +92,7 @@ def train(agent, env, max_episodes, max_steps, save_name):
         if max_steps and total_steps >= max_steps:
           break
         if observation[2] is True:  # Done
-          print("Episode:", total_episodes, "Total_steps:", total_steps, "Reward:", agent.reward)
+          if FLAGS.parallel == 1: print("Episode:", total_episodes, "Total_steps:", total_steps, "Reward:", agent.reward)
           break
         observation = env.step(actions)
   except KeyboardInterrupt:

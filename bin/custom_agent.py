@@ -34,10 +34,10 @@ from pysc2.lib import stopwatch
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_bool("render", False, "Whether to render with pygame.")
-point_flag.DEFINE_point("feature_screen_size", "28",
+flags.DEFINE_bool("render", True, "Whether to render with pygame.")
+point_flag.DEFINE_point("feature_screen_size", "6",
                         "Resolution for screen feature layers.")
-point_flag.DEFINE_point("feature_minimap_size", "24",
+point_flag.DEFINE_point("feature_minimap_size", "5",
                         "Resolution for minimap feature layers.")
 point_flag.DEFINE_point("rgb_screen_size", None,
                         "Resolution for rendered screen.")
@@ -55,7 +55,7 @@ flags.DEFINE_integer("game_steps_per_episode", None, "Game steps per episode.")
 flags.DEFINE_integer("max_episodes", 0, "Total episodes.")
 flags.DEFINE_integer("step_mul", 8, "Game steps per agent step.")
 
-flags.DEFINE_string("agent", "agent.a2c.A2CMoveToBeacon",
+flags.DEFINE_string("agent", "agent.sc2.a2c.A2CMoveToBeacon",
                     "Which agent to run, as a python path to an Agent class.")
 flags.DEFINE_enum("agent_race", "random", sc2_env.Race._member_names_,  # pylint: disable=protected-access
                   "Agent 1's race.")
