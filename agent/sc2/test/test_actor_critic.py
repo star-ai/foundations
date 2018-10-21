@@ -2,15 +2,15 @@ import unittest
 
 import numpy as np
 
-from agent.sc2.a2c import A2CMoveToBeacon
+from agent.sc2.actor_critic import ActorCriticMoveToBeacon
 
 
-class TestA2CMoveToBeacon(unittest.TestCase):
+class TestActorCriticMoveToBeacon(unittest.TestCase):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
   def setUp(self):
-    self.agent = A2CMoveToBeacon()
+    self.agent = ActorCriticMoveToBeacon()
 
 
   @unittest.skip("manual test: can't seriously test this one cus the model gives random results")

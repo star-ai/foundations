@@ -21,14 +21,7 @@ _PLAYER_ENEMY = features.PlayerRelative.ENEMY
 
 FUNCTIONS = actions.FUNCTIONS
 
-
-def _xy_locs(mask):
-  """Mask should be a set of bools from comparison with a feature layer."""
-  y, x = mask.nonzero()
-  return list(zip(x, y))
-
-
-class A2CMoveToBeacon(base_agent.BaseAgent):
+class ActorCriticMoveToBeacon(base_agent.BaseAgent):
   """A2C agent for move to beacon"""
   def __init__(self):
     super().__init__()
